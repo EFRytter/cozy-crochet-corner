@@ -1,21 +1,23 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
-import LoginModal from "./LoginModal";
+import { useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { Menu, X } from "lucide-react"
+import LoginModal from "./LoginModal"
+import { useAuth } from "@/components/Auth"
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLoginOpen, setIsLoginOpen] = useState(false)
+  const location = useLocation()
+  const { user, logout } = useAuth()
 
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/patterns", label: "Patterns" },
     { href: "/about", label: "About" },
-  ];
+  ]
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path
 
   return (
     <>
@@ -23,10 +25,9 @@ const Header = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="font-display text-2xl font-semibold text-foreground">
-              Cozy Stitches
+              Cozy Crochet Corner
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
                 <Link
@@ -44,13 +45,21 @@ const Header = () => {
             </nav>
 
             <div className="hidden md:flex items-center gap-4">
-              <Button variant="ghost" onClick={() => setIsLoginOpen(true)}>
-                Log in
-              </Button>
-              <Button onClick={() => setIsLoginOpen(true)}>Sign up</Button>
+              {user ? (
+                <>
+                  <span className="text-sm font-medium">{user.email}</span>
+                  <Button variant="ghost" onClick={logout}>Logout</Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" onClick={() => setIsLoginOpen(true)}>
+                    Log in
+                  </Button>
+                  <Button onClick={() => setIsLoginOpen(true)}>Sign up</Button>
+                </>
+              )}
             </div>
 
-            {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -60,7 +69,6 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="md:hidden py-4 border-t border-border animate-fade-in">
               <nav className="flex flex-col gap-4">
@@ -79,10 +87,19 @@ const Header = () => {
                   </Link>
                 ))}
                 <div className="flex flex-col gap-2 pt-4">
-                  <Button variant="ghost" onClick={() => setIsLoginOpen(true)}>
-                    Log in
-                  </Button>
-                  <Button onClick={() => setIsLoginOpen(true)}>Sign up</Button>
+                  {user ? (
+                    <>
+                      <span className="text-sm px-4 py-2 font-medium">{user.email}</span>
+                      <Button variant="ghost" onClick={logout}>Logout</Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="ghost" onClick={() => setIsLoginOpen(true)}>
+                        Log in
+                      </Button>
+                      <Button onClick={() => setIsLoginOpen(true)}>Sign up</Button>
+                    </>
+                  )}
                 </div>
               </nav>
             </div>
@@ -92,7 +109,7 @@ const Header = () => {
 
       <LoginModal open={isLoginOpen} onOpenChange={setIsLoginOpen} />
     </>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
